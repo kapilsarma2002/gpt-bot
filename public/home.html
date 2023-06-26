@@ -1,27 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bot-GPT</title>
-  <link rel="stylesheet" href="./styles/style.css">
-
-  <script>
-    const meetLink = document.getElementById('meetLink')
-    let inputMeetLink = ''
-    input.addEventListener('input', (event) => {
-      inputMeetLink = event.target.value
-    })
-    console.log(inputMeetLink)
-  </script>
-
-</head>
-<body>
-  <div class="home">
-    <div>
-      <input id="meetLink" type="text" placeholder="Meeting Link"/>
-      <button class="add">Add</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bot-GPT</title>
+    <link rel="stylesheet" href="./styles/style.css" />
+    <script src="meet.js"></script>
+  </head>
+  <body>
+    <div class="home">
+      <div>
+        <div>
+          <input id="meetLink" type="text" placeholder="Meeting ID" required />
+          <input id="meetPass" type="text" placeholder="Meeting Password" />
+        </div>
+        <button class="add">Add bot</button>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

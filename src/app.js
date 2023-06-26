@@ -12,6 +12,10 @@ app.get('/home', (req, res) => {
   res.sendFile('home.html', { root: 'public' })
 })
 
+app.get('/thankyou', (req, res) => [
+  res.sendFile('thankyou.html', { root: 'public' })
+])
+
 app.listen(port, () => {
   console.log(`App listening on port number ${port}`)
 })
