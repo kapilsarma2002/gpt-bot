@@ -1,3 +1,7 @@
+const axios = require('axios')
+const email = process.env.EMAIL
+const password = process.env.PASSWORD
+
 document.addEventListener('DOMContentLoaded', () => {
   const inputLink = document.getElementById('meetLink')
   const inputPass = document.getElementById('meetPass')
@@ -33,14 +37,26 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 })
 
-function joinMeeting(meetingId, passcode) {
+const joinMeeting = async (meetingId, passcode) => {
+  const joinUrl = `https://api.zoom.us/v2/meetings/${meetingId}/registrants`
+  const joinData = {
+    email: email,
+    password: password,
+    join_before_host: true,
+    meeting_pwd: passcode,
+  }
+
   try {
-    const joinUrl = `https://zoom.us/j/${meetingId}?pwd=${passcode}`
-    window.location.href = joinUrl
-  } catch (err) {
-    console.log('error is ' + err)
+    await axios.post(joinUrl, joinData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    res.send('Bot successfully joined the Zoom meeting!')
+  } catch (error) {
+    console.error('Error:', error.response.data)
+    res.status(500).send('An error occurred while joining the meeting.')
   }
 }
-
-// 873 2111 9257
-// bnb6NC

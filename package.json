@@ -12,6 +12,7 @@
   "dependencies": {
     "@zoomus/websdk": "^2.13.0",
     "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2"
   }
 }
