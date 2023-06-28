@@ -1,10 +1,14 @@
 const express = require('express')
+const bodyParser = require('body-parser')
+const axios = require('axios')
 const app = express()
 const port = 3000
 
 require('dotenv').config()
 
 app.use(express.static('public'))
+
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
   res.sendFile('index.html', { root: 'public' })
@@ -14,49 +18,60 @@ app.get('/home', (req, res) => {
   res.sendFile('home.html', { root: 'public' })
 })
 
-app.get('/thankyou', (req, res) => [
-  res.sendFile('thankyou.html', { root: 'public' }),
-])
-
-const accessToken = 'YOUR_ACCESS_TOKEN'
+app.get('/thankyou', (req, res) => {
+  res.sendFile('thankyou.html', { root: 'public' })
+})
 
 const clientId = process.env.CLIENT_ID
 const clientSecret = process.env.CLIENT_SECRET
 const redirectUri = process.env.REDIRECT_URL
 
-// Step 1: Redirect the user to the Zoom authorization URL
-app.get('/auth', (req, res) => {
-  const authUrl = `https://zoom.us/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`
-  res.redirect(authUrl)
-})
+app.post('/join-meeting', async (req, res) => {
+  const { meetingLink, passcode } = req.body
 
-// Step 2: Handle the callback after user authorization
-app.get('/callback', async (req, res) => {
-  const { code } = req.query
+  console.log(req.body)
 
   try {
-    // Step 3: Exchange authorization code for access token
-    const tokenUrl = 'https://zoom.us/oauth/token'
-    const response = await axios.post(tokenUrl, {
+    // Exchange the authorization code for an access token
+    const { data } = await axios.post('https://zoom.us/oauth/token', {
       grant_type: 'authorization_code',
-      code,
+      code: passcode,
+      redirect_uri: redirectUri, // Replace with your own redirect URI
       client_id: clientId,
       client_secret: clientSecret,
-      redirect_uri: redirectUri,
     })
 
-    const accessToken = response.data.access_token
+    // console.log(data)
 
-    // Step 4: Use the access token to make API requests
-    // You can join a meeting using the access token here
+    const accessToken = data.access_token
+    console.log('access token :', accessToken)
 
-    res.send('Authorization successful! You can now join a meeting.')
-  } catch (error) {
-    console.error(
-      'Error exchanging authorization code for access token:',
-      error
+    // Use the access token to join the meeting
+    const { data: joinMeetingResponse } = await axios.post(
+      `https://api.zoom.us/v2/meetings/${meetingLink}/registrants`,
+      {
+        email: 'bot.gpt.17@gmail.com',
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
     )
-    res.status(500).send('An error occurred during authorization.')
+
+    // Handle the join meeting response as per your requirement
+    console.log(joinMeetingResponse)
+
+    res.status(200).json({ message: 'Meeting joined successfully' })
+  } catch (error) {
+    console.error(error)
+    if (error.response) {
+      console.error('Response data:', error.response.data)
+      console.error('Response status:', error.response.status)
+      console.error('Response headers:', error.response.headers)
+    }
+
+    res.status(500).json({ error: 'Failed to join meeting' })
   }
 })
 
